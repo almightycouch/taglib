@@ -67,4 +67,9 @@ defmodule Taglib do
   Returns the audio length for the given `fileref`.
   """
   def audio_length(_fileref), do: raise Code.LoadError, file: @nif_path
+
+  @doc """
+  Returns the cover-art picture for the given `fileref`.
+  """
+  def picture(_fileref), do: raise Code.LoadError, file: @nif_path
 end
