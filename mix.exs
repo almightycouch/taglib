@@ -22,7 +22,7 @@ defmodule Taglib.Mixfile do
   end
 
   defp package do
-    [files: ["c_str", "lib", "mix.exs", "Makefile", "README.md", "LICENSE"],
+    [files: ["c_src", "lib", "mix.exs", "Makefile", "README.md", "LICENSE"],
       maintainers: ["Mario Flach"],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/almightycouch/taglib"}]
