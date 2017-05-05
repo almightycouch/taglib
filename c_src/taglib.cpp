@@ -27,8 +27,9 @@ static std::string binary_to_string(ErlNifEnv* env, const ERL_NIF_TERM term)
 static ERL_NIF_TERM string_to_binary(ErlNifEnv* env, const TagLib::String& str)
 {
     ErlNifBinary bin;
-    enif_alloc_binary(str.size(), &bin);
-    std::memcpy(bin.data, str.data(TagLib::String::UTF8).data(), str.size());
+    const TagLib::ByteVector utf8_str = str.data(TagLib::String::UTF8);
+    enif_alloc_binary(utf8_str.size(), &bin);
+    std::memcpy(bin.data, utf8_str.data(), utf8_str.size());
     return enif_make_binary(env, &bin);
 }
 
