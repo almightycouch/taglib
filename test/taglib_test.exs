@@ -1,6 +1,6 @@
 defmodule TaglibTest do
   use ExUnit.Case
-  doctest Taglib
+# doctest Taglib
 
   test "the truth" do
     assert 1 + 1 == 2

@@ -14,7 +14,7 @@ defmodule Taglib do
 
   @on_load :load_nif
 
-  @nif_path "priv/taglib_nif"
+  @nif_path Path.join(:code.priv_dir(:taglib), "taglib_nif")
 
   require Logger
 
