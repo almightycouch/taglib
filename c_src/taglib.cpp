@@ -1,5 +1,12 @@
+#include <cstring>
 #include <erl_nif.h>
 #include <taglib/fileref.h>
+#include <taglib/audioproperties.h>
+#include <taglib/tag.h>
+
+#ifndef nullptr
+#define nullptr NULL
+#endif
 
 static ErlNifResourceType* taglib_nif_resource = nullptr;
 
@@ -21,7 +28,7 @@ static ERL_NIF_TERM string_to_binary(ErlNifEnv* env, const TagLib::String& str)
 {
     ErlNifBinary bin;
     enif_alloc_binary(str.size(), &bin);
-    memcpy(bin.data, str.data(TagLib::String::UTF8).data(), str.size());
+    std::memcpy(bin.data, str.data(TagLib::String::UTF8).data(), str.size());
     return enif_make_binary(env, &bin);
 }
 
