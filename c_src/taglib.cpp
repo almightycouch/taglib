@@ -168,28 +168,45 @@ static ERL_NIF_TERM picture(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
             TagLib::MP4::CoverArtList covers = items["covr"].toCoverArtList();
             if(!covers.isEmpty()) {
                 TagLib::MP4::CoverArt cover = covers.front();
-                return string_to_binary(env, cover.data());
+                TagLib::String mimetype;
+                switch(cover.format()) {
+                    case TagLib::MP4::CoverArt::Format::JPEG:
+                        mimetype = "image/jpeg";
+                        break;
+                    case TagLib::MP4::CoverArt::Format::PNG:
+                        mimetype = "image/png";
+                        break;
+                    case TagLib::MP4::CoverArt::Format::BMP:
+                        mimetype = "image/bmp";
+                        break;
+                    case TagLib::MP4::CoverArt::Format::GIF:
+                        mimetype = "image/gif";
+                }
+                return enif_make_tuple(env, 2, string_to_binary(env, mimetype), string_to_binary(env, cover.data()));
             }
         } else if(TagLib::MPEG::File *mp3 = dynamic_cast<TagLib::MPEG::File *>(file)) {
             TagLib::ID3v2::Tag *tag = mp3->ID3v2Tag();
             TagLib::ID3v2::FrameList covers = tag->frameList("APIC");
             if(!covers.isEmpty()) {
                 TagLib::ID3v2::AttachedPictureFrame *frame = static_cast<TagLib::ID3v2::AttachedPictureFrame *>(covers.front());
-                return string_to_binary(env, frame->picture());
+                TagLib::String mimetype = frame->mimeType();
+                return enif_make_tuple(env, 2, string_to_binary(env, mimetype), string_to_binary(env, frame->picture()));
             }
         } else if(TagLib::FLAC::File *flac = dynamic_cast<TagLib::FLAC::File *>(file)) {
             TagLib::List<TagLib::FLAC::Picture *> covers = flac->pictureList();
             if(!covers.isEmpty()) {
-                TagLib::FLAC::Picture *cover = covers.front();
-                return string_to_binary(env, cover->data());
+                TagLib::FLAC::Picture *picture = covers.front();
+                TagLib::String mimetype = picture->mimeType();
+                return enif_make_tuple(env, 2, string_to_binary(env, mimetype), string_to_binary(env, picture->data()));
             }
         } else if(TagLib::ASF::File *asf = dynamic_cast<TagLib::ASF::File *>(file)) {
             TagLib::ASF::Tag *tag = static_cast<TagLib::ASF::Tag *>(asf->tag());
             TagLib::ASF::AttributeListMap attrs = tag->attributeListMap();
             TagLib::ASF::AttributeList covers = attrs["WM/Picture"];
             if(!covers.isEmpty()) {
-                TagLib::ASF::Picture cover = covers.front().toPicture();
-                return string_to_binary(env, cover.picture());
+                TagLib::ASF::Picture picture = covers.front().toPicture();
+                TagLib::String mimetype = picture.mimeType();
+                return enif_make_tuple(env, 2, string_to_binary(env, mimetype), string_to_binary(env, picture.picture()));
             }
         }
     }
