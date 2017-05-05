@@ -1,4 +1,3 @@
-#include <iostream>
 #include <erl_nif.h>
 #include <taglib/fileref.h>
 
