@@ -8,6 +8,10 @@
 
 Taglib bindings for Elixir.
 
+## Documentation
+
+See the [online documentation](https://hexdocs.pm/taglib/) for more information.
+
 ## Installation
 
 First, ensure you have the [TagLib](http://taglib.org) libraries installed on your system:
