@@ -4,6 +4,8 @@ defmodule Taglib do
 
   This module provides a simple wrapper around the Taglib C++ API.
 
+  ## Examples
+
       iex> {:ok, ref} = Taglib.new("song.mp3")
       {:ok, ""}
       iex> Taglib.tag_title(ref)

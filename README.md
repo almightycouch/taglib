@@ -8,7 +8,7 @@
 
 Taglib bindings for Elixir.
 
-## Dependencies
+## Installation
 
 First, ensure you have the [TagLib](http://taglib.org) libraries installed on your system:
 
@@ -22,9 +22,7 @@ brew install taglib
 sudo apt-get install libtag1-dev
 ```
 
-## Installation
-
-Add `:taglib` to your list of dependencies in `mix.exs`:
+Next, add `:taglib` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
