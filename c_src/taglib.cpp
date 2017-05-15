@@ -159,7 +159,7 @@ static ERL_NIF_TERM audio_length(ErlNifEnv* env, int argc, const ERL_NIF_TERM ar
     }
 }
 
-static ERL_NIF_TERM picture(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+static ERL_NIF_TERM artwork_picture(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     if(TagLib::File *file = taglib_nif_resource_file(env, argc, argv)) {
         if(TagLib::MP4::File *mp4 = dynamic_cast<TagLib::MP4::File *>(file)) {
@@ -234,7 +234,7 @@ static ErlNifFunc taglib_nif_funcs[] =
     {"tag_year", 1, tag_year},
     {"tag_track", 1, tag_track},
     {"audio_length", 1, audio_length},
-    {"picture", 1, picture}
+    {"artwork_picture", 1, artwork_picture}
 };
 
 ERL_NIF_INIT(Elixir.Taglib, taglib_nif_funcs, &taglib_nif_init, NULL, NULL, NULL)
