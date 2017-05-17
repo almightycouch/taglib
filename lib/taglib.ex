@@ -62,16 +62,28 @@ defmodule Taglib do
   def tag_genre(_ref), do: raise Code.LoadError, file: @nif_path
 
   @doc """
-  Returns the year for the given `fileref`.
+  Returns the disc number for the given `fileref`.
   """
-  @spec tag_year(fileref) :: Integer.t
-  def tag_year(_ref), do: raise Code.LoadError, file: @nif_path
+  @spec tag_disc(fileref) :: Integer.t
+  def tag_disc(_ref), do: raise Code.LoadError, file: @nif_path
 
   @doc """
   Returns the track number for the given `fileref`.
   """
   @spec tag_track(fileref) :: Integer.t
   def tag_track(_ref), do: raise Code.LoadError, file: @nif_path
+
+  @doc """
+  Returns the year for the given `fileref`.
+  """
+  @spec tag_year(fileref) :: Integer.t
+  def tag_year(_ref), do: raise Code.LoadError, file: @nif_path
+
+  @doc """
+  Returns `true` if the track is part of a compilation; elsewhise returns `false`.
+  """
+  @spec tag_compilation(fileref) :: boolean
+  def tag_compilation(_ref), do: raise Code.LoadError, file: @nif_path
 
   @doc """
   Returns the audio length for the given `fileref`.

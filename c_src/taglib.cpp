@@ -1,5 +1,10 @@
 #include <cstring>
+
+#include <sstream>
+#include <algorithm>
+
 #include <erl_nif.h>
+
 #include <taglib/fileref.h>
 #include <taglib/audioproperties.h>
 #include <taglib/tag.h>
@@ -12,10 +17,11 @@
 #include <taglib/id3v2tag.h>
 #include <taglib/attachedpictureframe.h>
 #include <taglib/flacfile.h>
+#include <taglib/xiphcomment.h>
 #include <taglib/asffile.h>
 
 #ifndef nullptr
-#define nullptr NULL
+    #define nullptr NULL
 #endif
 
 static ErlNifResourceType* taglib_nif_resource = nullptr;
@@ -24,6 +30,104 @@ typedef struct
 {
     TagLib::File *taglib_file;
 } taglib_nif_handle;
+
+/* Turn a string into an integer type for any map class. */
+template <typename T, typename M>
+inline T extractTag(const M &map, const char *key)
+{
+	T ret = 0;
+	std::istringstream stream(extractTag<std::string>(map, key));
+	stream >> ret;
+	return ret;
+}
+/* Turn a string into a pair of integer types separated by a slash
+ * for any map class. */
+template <typename T1, typename T2, typename M>
+inline std::pair<T1, T2> extractTag(const M &map, const char *key)
+{
+	std::pair<T1, T2> values;
+	values.first = 0;
+	values.second = 0;
+	char slash = '\0';
+	std::istringstream stream(extractTag<std::string>(map, key));
+	stream >> values.first >> slash >> values.second;
+	if (slash != '/')
+		values.second = 0;
+	return values;
+}
+/* Extract a string out of an MP3 map. */
+template <>
+inline std::string extractTag<std::string, TagLib::ID3v2::FrameListMap>(const TagLib::ID3v2::FrameListMap &map, const char *key)
+{
+	if (map[key].isEmpty())
+		return std::string();
+	return map[key].front()->toString().to8Bit(true);
+}
+/* Turn a string into a bool, based on "1" and "true", for MP3. */
+template <>
+inline bool extractTag<bool, TagLib::ID3v2::FrameListMap>(const TagLib::ID3v2::FrameListMap &map, const char *key)
+{
+	std::string str(extractTag<std::string>(map, key));
+	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+	return (str == "1" || str == "true");
+}
+/* Extract a string out of an OGG map. */
+template <>
+inline std::string extractTag<std::string, TagLib::Ogg::FieldListMap>(const TagLib::Ogg::FieldListMap &map, const char *key)
+{
+	if (map[key].isEmpty())
+		return std::string();
+	return map[key].front().to8Bit(true);
+}
+/* Turn a string into a bool, based on "1" and "true", for OGG. */
+template <>
+inline bool extractTag<bool, TagLib::Ogg::FieldListMap>(const TagLib::Ogg::FieldListMap &map, const char *key)
+{
+	std::string str(extractTag<std::string>(map, key));
+	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+	return (str == "1" || str == "true");
+}
+/* Extract an integer pair out of an MP4 map. */
+template <typename T1, typename T2>
+inline std::pair<T1, T2> extractTag(const TagLib::MP4::ItemListMap &map, const char *key)
+{
+	if (!map[key].isValid())
+		return std::pair<T1, T2>(0, 0);
+	TagLib::MP4::Item::IntPair pair = map[key].toIntPair();
+	return std::pair<T1, T2>(pair.first, pair.second);
+}
+/* Extract an integer out of an MP4 map. */
+template <>
+inline unsigned int extractTag<unsigned int, TagLib::MP4::ItemListMap>(const TagLib::MP4::ItemListMap &map, const char *key)
+{
+	if (!map[key].isValid())
+		return 0;
+	return map[key].toInt();
+}
+/* Extract a string out of an MP4 map. */
+template <>
+inline std::string extractTag<std::string, TagLib::MP4::ItemListMap>(const TagLib::MP4::ItemListMap &map, const char *key)
+{
+	if (!map[key].isValid())
+		return std::string();
+	return map[key].toStringList().toString().to8Bit(true);
+}
+/* Extract a bool out of an MP4 map. */
+template <>
+inline bool extractTag<bool, TagLib::MP4::ItemListMap>(const TagLib::MP4::ItemListMap &map, const char *key)
+{
+	if (!map[key].isValid())
+		return false;
+	return map[key].toBool();
+}
+
+static ERL_NIF_TERM enif_make_bool(ErlNifEnv* env, bool boolean){
+    if(boolean) {
+        return enif_make_atom(env, "true");
+    } else {
+        return enif_make_atom(env, "false");
+    }
+}
 
 static std::string binary_to_string(ErlNifEnv* env, const ERL_NIF_TERM term)
 {
@@ -132,10 +236,24 @@ static ERL_NIF_TERM tag_genre(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[
     }
 }
 
-static ERL_NIF_TERM tag_year(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+static ERL_NIF_TERM tag_disc(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
-    if(TagLib::Tag *tag = taglib_nif_resource_tag(env, argc, argv)) {
-        return enif_make_uint(env, tag->year());
+    if(TagLib::File *file = taglib_nif_resource_file(env, argc, argv)) {
+        if(TagLib::MP4::File *mp4 = dynamic_cast<TagLib::MP4::File *>(file)) {
+            TagLib::MP4::Tag *tag = mp4->tag();
+            const TagLib::MP4::ItemListMap &list_map = tag->itemListMap();
+            std::pair<unsigned int, unsigned int> discPair = extractTag<unsigned int, unsigned int>(list_map, "disk");
+            return enif_make_uint(env, discPair.first);
+        } else if(TagLib::MPEG::File *mp3 = dynamic_cast<TagLib::MPEG::File *>(file)) {
+            TagLib::ID3v2::Tag *tag = mp3->ID3v2Tag();
+            const TagLib::ID3v2::FrameListMap &list_map = tag->frameListMap();
+            std::pair<unsigned int, unsigned int> discPair = extractTag<unsigned int, unsigned int>(list_map, "TPOS");
+            return enif_make_uint(env, discPair.first);
+        } else if(TagLib::FLAC::File *flac = dynamic_cast<TagLib::FLAC::File *>(file)) {
+            TagLib::Ogg::XiphComment *comment = flac->xiphComment();
+            const TagLib::Ogg::FieldListMap &list_map = comment->fieldListMap();
+            return enif_make_uint(env, extractTag<unsigned int>(list_map, "DISCNUMBER"));
+        }
     } else {
         return enif_make_badarg(env);
     }
@@ -150,6 +268,35 @@ static ERL_NIF_TERM tag_track(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[
     }
 }
 
+static ERL_NIF_TERM tag_year(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    if(TagLib::Tag *tag = taglib_nif_resource_tag(env, argc, argv)) {
+        return enif_make_uint(env, tag->year());
+    } else {
+        return enif_make_badarg(env);
+    }
+}
+
+static ERL_NIF_TERM tag_compilation(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    if(TagLib::File *file = taglib_nif_resource_file(env, argc, argv)) {
+        if(TagLib::MP4::File *mp4 = dynamic_cast<TagLib::MP4::File *>(file)) {
+            TagLib::MP4::Tag *tag = mp4->tag();
+            const TagLib::MP4::ItemListMap &list_map = tag->itemListMap();
+            return enif_make_bool(env, extractTag<bool>(list_map, "cpil"));
+        } else if(TagLib::MPEG::File *mp3 = dynamic_cast<TagLib::MPEG::File *>(file)) {
+            TagLib::ID3v2::Tag *tag = mp3->ID3v2Tag();
+            const TagLib::ID3v2::FrameListMap &list_map = tag->frameListMap();
+            return enif_make_bool(env, extractTag<bool>(list_map, "TCMP"));
+        } else if(TagLib::FLAC::File *flac = dynamic_cast<TagLib::FLAC::File *>(file)) {
+            TagLib::Ogg::XiphComment *comment = flac->xiphComment();
+            const TagLib::Ogg::FieldListMap &list_map = comment->fieldListMap();
+            return enif_make_bool(env, extractTag<bool>(list_map, "COMPILATION"));
+        }
+    } else {
+        return enif_make_badarg(env);
+    }
+}
 static ERL_NIF_TERM audio_length(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     if(TagLib::AudioProperties *props = taglib_nif_resource_audio_props(env, argc, argv)) {
@@ -231,8 +378,10 @@ static ErlNifFunc taglib_nif_funcs[] =
     {"tag_artist", 1, tag_artist},
     {"tag_album", 1, tag_album},
     {"tag_genre", 1, tag_genre},
-    {"tag_year", 1, tag_year},
+    {"tag_disc", 1, tag_disc},
     {"tag_track", 1, tag_track},
+    {"tag_year", 1, tag_year},
+    {"tag_compilation", 1, tag_compilation},
     {"audio_length", 1, audio_length},
     {"artwork_picture", 1, artwork_picture}
 };
