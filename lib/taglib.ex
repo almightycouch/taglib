@@ -38,43 +38,43 @@ defmodule Taglib do
   def new(_path), do: raise Code.LoadError, file: @nif_path
 
   @doc """
-  Returns the title for the given `fileref`.
+  Returns the title of the song.
   """
   @spec tag_title(fileref) :: String.t
   def tag_title(_ref), do: raise Code.LoadError, file: @nif_path
 
   @doc """
-  Returns the artist for the given `fileref`.
+  Returns the artist name of the song.
   """
   @spec tag_artist(fileref) :: String.t
   def tag_artist(_ref), do: raise Code.LoadError, file: @nif_path
 
   @doc """
-  Returns the album for the given `fileref`.
+  Returns the album name of the song.
   """
   @spec tag_album(fileref) :: String.t
   def tag_album(_ref), do: raise Code.LoadError, file: @nif_path
 
   @doc """
-  Returns the genre for the given `fileref`.
+  Returns the genre of the song.
   """
   @spec tag_genre(fileref) :: String.t
   def tag_genre(_ref), do: raise Code.LoadError, file: @nif_path
 
   @doc """
-  Returns the disc number for the given `fileref`.
+  Returns the disc number of the song.
   """
   @spec tag_disc(fileref) :: Integer.t
   def tag_disc(_ref), do: raise Code.LoadError, file: @nif_path
 
   @doc """
-  Returns the track number for the given `fileref`.
+  Returns the track number of the song.
   """
   @spec tag_track(fileref) :: Integer.t
   def tag_track(_ref), do: raise Code.LoadError, file: @nif_path
 
   @doc """
-  Returns the year for the given `fileref`.
+  Returns the year of the song.
   """
   @spec tag_year(fileref) :: Integer.t
   def tag_year(_ref), do: raise Code.LoadError, file: @nif_path
@@ -86,13 +86,13 @@ defmodule Taglib do
   def tag_compilation(_ref), do: raise Code.LoadError, file: @nif_path
 
   @doc """
-  Returns the audio length for the given `fileref`.
+  Returns the audio length of the song.
   """
   @spec audio_length(fileref) :: Integer.t
   def audio_length(_ref), do: raise Code.LoadError, file: @nif_path
 
   @doc """
-  Returns the cover-art picture for the given `fileref`.
+  Returns the cover-art picture of the song.
   """
   @spec artwork_picture(fileref) :: {mimetype, binary}
   def artwork_picture(_ref), do: raise Code.LoadError, file: @nif_path
