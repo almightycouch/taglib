@@ -6,20 +6,25 @@ defmodule Taglib do
 
   ## Examples
 
-      iex> {:ok, ref} = Taglib.new("song.mp3")
-      {:ok, ""}
-      iex> Taglib.tag_title(ref)
+      iex> {:ok, t} = Taglib.new("song.mp3")
+      {:ok, #Taglib<0.0.7.1219>}
+      iex> Taglib.title(t)
       "Mi Mujer"
-      iex> Taglib.audio_length(ref)
+      iex> Taglib.duration(t)
       438
   """
+
+  defstruct [:ptr, :ref]
 
   @on_load :load_nif
 
   @nif_path Path.join(:code.priv_dir(:taglib), "taglib_nif")
 
-  @type fileref :: term
   @type mimetype :: String.t
+  @type t :: %__MODULE__{
+    ref: reference,
+    ptr: binary
+  }
 
   require Logger
 
@@ -31,69 +36,115 @@ defmodule Taglib do
     end
   end
 
+  @doc false
+  def init(_path), do: raise Code.LoadError, file: @nif_path
+
   @doc """
-  Create a new file reference for the given `filepath`.
+  Create a new file reference for the given `path`.
   """
-  @spec new(Path.t) :: {:ok, fileref} | {:error, :invalid_file}
-  def new(_path), do: raise Code.LoadError, file: @nif_path
+  @spec new(Path.t) :: {:ok, t} | {:error, term}
+  def new(path) do
+    case init(path) do
+      {:ok, ptr} ->
+        {:ok, struct(__MODULE__, ptr: ptr, ref: make_ref())}
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
 
   @doc """
   Returns the title of the song.
   """
-  @spec tag_title(fileref) :: String.t
-  def tag_title(_ref), do: raise Code.LoadError, file: @nif_path
+  @spec title(t) :: String.t
+  def title(taglib), do: tag_title(taglib.ptr)
+
+  @doc false
+  def tag_title(_ptr), do: raise Code.LoadError, file: @nif_path
 
   @doc """
   Returns the artist name of the song.
   """
-  @spec tag_artist(fileref) :: String.t
-  def tag_artist(_ref), do: raise Code.LoadError, file: @nif_path
+  @spec artist(t) :: String.t
+  def artist(taglib), do: tag_artist(taglib.ptr)
+
+  @doc false
+  def tag_artist(_ptr), do: raise Code.LoadError, file: @nif_path
 
   @doc """
   Returns the album name of the song.
   """
-  @spec tag_album(fileref) :: String.t
-  def tag_album(_ref), do: raise Code.LoadError, file: @nif_path
+  @spec album(t) :: String.t
+  def album(taglib), do: tag_album(taglib.ptr)
+
+  @doc false
+  def tag_album(_ptr), do: raise Code.LoadError, file: @nif_path
 
   @doc """
   Returns the genre of the song.
   """
-  @spec tag_genre(fileref) :: String.t
-  def tag_genre(_ref), do: raise Code.LoadError, file: @nif_path
+  @spec genre(t) :: String.t
+  def genre(taglib), do: tag_genre(taglib.ptr)
+
+  @doc false
+  def tag_genre(_ptr), do: raise Code.LoadError, file: @nif_path
 
   @doc """
   Returns the disc number of the song.
   """
-  @spec tag_disc(fileref) :: Integer.t
-  def tag_disc(_ref), do: raise Code.LoadError, file: @nif_path
+  @spec disc(t) :: Integer.t
+  def disc(taglib), do: tag_disc(taglib.ptr)
+
+  @doc false
+  def tag_disc(_ptr), do: raise Code.LoadError, file: @nif_path
 
   @doc """
   Returns the track number of the song.
   """
-  @spec tag_track(fileref) :: Integer.t
-  def tag_track(_ref), do: raise Code.LoadError, file: @nif_path
+  @spec track(t) :: Integer.t
+  def track(taglib), do: tag_track(taglib.ptr)
+
+  @doc false
+  def tag_track(_ptr), do: raise Code.LoadError, file: @nif_path
 
   @doc """
   Returns the year of the song.
   """
-  @spec tag_year(fileref) :: Integer.t
-  def tag_year(_ref), do: raise Code.LoadError, file: @nif_path
+  @spec year(t) :: Integer.t
+  def year(taglib), do: tag_year(taglib.ptr)
+
+  @doc false
+  def tag_year(_ptr), do: raise Code.LoadError, file: @nif_path
 
   @doc """
   Returns `true` if the track is part of a compilation; elsewhise returns `false`.
   """
-  @spec tag_compilation(fileref) :: boolean
-  def tag_compilation(_ref), do: raise Code.LoadError, file: @nif_path
+  @spec compilation(t) :: boolean
+  def compilation(taglib), do: tag_compilation(taglib.ptr)
+
+  @doc false
+  def tag_compilation(_ptr), do: raise Code.LoadError, file: @nif_path
 
   @doc """
   Returns the audio length of the song.
   """
-  @spec audio_length(fileref) :: Integer.t
-  def audio_length(_ref), do: raise Code.LoadError, file: @nif_path
+  @spec duration(t) :: Integer.t
+  def duration(taglib), do: audio_length(taglib.ptr)
+
+  @doc false
+  def audio_length(_ptr), do: raise Code.LoadError, file: @nif_path
 
   @doc """
   Returns the cover-art picture of the song.
   """
-  @spec artwork_picture(fileref) :: {mimetype, binary}
-  def artwork_picture(_ref), do: raise Code.LoadError, file: @nif_path
+  @spec artwork(t) :: {mimetype, binary}
+  def artwork(taglib), do: artwork_picture(taglib.ptr)
+
+  @doc false
+  def artwork_picture(_ptr), do: raise Code.LoadError, file: @nif_path
+end
+
+defimpl Inspect, for: Taglib do
+  def inspect(taglib, _opts) do
+    String.replace("#{inspect taglib.ref}", "Reference", "Taglib")
+  end
 end

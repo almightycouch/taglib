@@ -373,7 +373,7 @@ static int taglib_nif_init(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_i
 
 static ErlNifFunc taglib_nif_funcs[] =
 {
-    {"new", 1, taglib_nif_resource_create},
+    {"init", 1, taglib_nif_resource_create},
     {"tag_title", 1, tag_title},
     {"tag_artist", 1, tag_artist},
     {"tag_album", 1, tag_album},
