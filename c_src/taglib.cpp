@@ -153,18 +153,20 @@ static ERL_NIF_TERM string_to_binary(ErlNifEnv* env, const TagLib::String& str)
 
 static ERL_NIF_TERM taglib_nif_resource_create(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
-    TagLib::File *file = TagLib::FileRef::create(binary_to_string(env, argv[0]).data());
-    if(file->isValid()) {
-        taglib_nif_handle *handle = static_cast<taglib_nif_handle*>(enif_alloc_resource(taglib_nif_resource, sizeof(taglib_nif_handle)));
-        handle->taglib_file = file;
-
-        ERL_NIF_TERM result = enif_make_resource(env, handle);
-        enif_release_resource(handle);
-
-        return enif_make_tuple(env, 2, enif_make_atom(env, "ok"), result);
-    } else {
-        return enif_make_tuple(env, 2, enif_make_atom(env, "error"), enif_make_atom(env, "invalid_file"));
+    std::string filepath = binary_to_string(env, argv[0]);
+    if(TagLib::File::isReadable(filepath.data())) {
+        TagLib::File *file = TagLib::FileRef::create(filepath.data());
+        if(file != nullptr) {
+            if(file->isValid()) {
+                taglib_nif_handle *handle = static_cast<taglib_nif_handle*>(enif_alloc_resource(taglib_nif_resource, sizeof(taglib_nif_handle)));
+                handle->taglib_file = file;
+                ERL_NIF_TERM result = enif_make_resource(env, handle);
+                enif_release_resource(handle);
+                return enif_make_tuple(env, 2, enif_make_atom(env, "ok"), result);
+            }
+        }
     }
+    return enif_make_tuple(env, 2, enif_make_atom(env, "error"), enif_make_atom(env, "invalid_file"));
 }
 
 static void taglib_nif_resource_cleanup(ErlNifEnv* env, void* arg)
@@ -373,7 +375,7 @@ static int taglib_nif_init(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_i
 
 static ErlNifFunc taglib_nif_funcs[] =
 {
-    {"init", 1, taglib_nif_resource_create},
+    {"init_taglib", 1, taglib_nif_resource_create},
     {"tag_title", 1, tag_title},
     {"tag_artist", 1, tag_artist},
     {"tag_album", 1, tag_album},

@@ -37,14 +37,14 @@ defmodule Taglib do
   end
 
   @doc false
-  def init(_path), do: raise Code.LoadError, file: @nif_path
+  def init_taglib(_path), do: raise Code.LoadError, file: @nif_path
 
   @doc """
-  Create a new file reference for the given `path`.
+  Creates a new file reference for the given `path`.
   """
   @spec new(Path.t) :: {:ok, t} | {:error, term}
   def new(path) do
-    case init(path) do
+    case init_taglib(path) do
       {:ok, ptr} ->
         {:ok, struct(__MODULE__, ptr: ptr, ref: make_ref())}
       {:error, reason} ->
