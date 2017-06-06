@@ -41,6 +41,6 @@ iex> {:ok, t} = Taglib.new("song.mp3")
 {:ok, #Taglib<0.0.7.1219>}
 iex> Taglib.title(t)
 "Mi Mujer"
-iex> Taglib.duraiton(t)
+iex> Taglib.duration(t)
 438
 ```
