@@ -30,17 +30,17 @@ Next, add `:taglib` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:taglib, "~> 0.1"}]
+  [{:taglib, "~> 0.2"}]
 end
 ```
 
 ## Usage
 
 ```elixir
-iex> {:ok, ref} = Taglib.new("song.mp3")
-{:ok, ""}
-iex> Taglib.tag_title(ref)
+iex> {:ok, t} = Taglib.new("song.mp3")
+{:ok, #Taglib<0.0.7.1219>}
+iex> Taglib.title(t)
 "Mi Mujer"
-iex> Taglib.audio_length(ref)
+iex> Taglib.duraiton(t)
 438
 ```
