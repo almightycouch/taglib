@@ -56,7 +56,7 @@ defmodule Taglib do
   Returns the title of the song.
   """
   @spec title(t) :: String.t
-  def title(taglib), do: tag_title(taglib.ptr)
+  def title(%__MODULE__{} = taglib), do: tag_title(taglib.ptr)
 
   @doc false
   def tag_title(_ptr), do: raise Code.LoadError, file: @nif_path
@@ -65,7 +65,7 @@ defmodule Taglib do
   Returns the artist name of the song.
   """
   @spec artist(t) :: String.t
-  def artist(taglib), do: tag_artist(taglib.ptr)
+  def artist(%__MODULE__{} = taglib), do: tag_artist(taglib.ptr)
 
   @doc false
   def tag_artist(_ptr), do: raise Code.LoadError, file: @nif_path
@@ -74,7 +74,7 @@ defmodule Taglib do
   Returns the album name of the song.
   """
   @spec album(t) :: String.t
-  def album(taglib), do: tag_album(taglib.ptr)
+  def album(%__MODULE__{} = taglib), do: tag_album(taglib.ptr)
 
   @doc false
   def tag_album(_ptr), do: raise Code.LoadError, file: @nif_path
@@ -83,7 +83,7 @@ defmodule Taglib do
   Returns the genre of the song.
   """
   @spec genre(t) :: String.t
-  def genre(taglib), do: tag_genre(taglib.ptr)
+  def genre(%__MODULE__{} = taglib), do: tag_genre(taglib.ptr)
 
   @doc false
   def tag_genre(_ptr), do: raise Code.LoadError, file: @nif_path
@@ -92,7 +92,7 @@ defmodule Taglib do
   Returns the disc number of the song.
   """
   @spec disc(t) :: Integer.t
-  def disc(taglib), do: tag_disc(taglib.ptr)
+  def disc(%__MODULE__{} = taglib), do: tag_disc(taglib.ptr)
 
   @doc false
   def tag_disc(_ptr), do: raise Code.LoadError, file: @nif_path
@@ -101,7 +101,7 @@ defmodule Taglib do
   Returns the track number of the song.
   """
   @spec track(t) :: Integer.t
-  def track(taglib), do: tag_track(taglib.ptr)
+  def track(%__MODULE__{} = taglib), do: tag_track(taglib.ptr)
 
   @doc false
   def tag_track(_ptr), do: raise Code.LoadError, file: @nif_path
@@ -110,7 +110,7 @@ defmodule Taglib do
   Returns the year of the song.
   """
   @spec year(t) :: Integer.t
-  def year(taglib), do: tag_year(taglib.ptr)
+  def year(%__MODULE__{} = taglib), do: tag_year(taglib.ptr)
 
   @doc false
   def tag_year(_ptr), do: raise Code.LoadError, file: @nif_path
@@ -119,7 +119,7 @@ defmodule Taglib do
   Returns `true` if the track is part of a compilation; elsewhise returns `false`.
   """
   @spec compilation(t) :: boolean
-  def compilation(taglib), do: tag_compilation(taglib.ptr)
+  def compilation(%__MODULE__{} = taglib), do: tag_compilation(taglib.ptr)
 
   @doc false
   def tag_compilation(_ptr), do: raise Code.LoadError, file: @nif_path
@@ -128,7 +128,7 @@ defmodule Taglib do
   Returns the audio length of the song.
   """
   @spec duration(t) :: Integer.t
-  def duration(taglib), do: audio_length(taglib.ptr)
+  def duration(%__MODULE__{} = taglib), do: audio_length(taglib.ptr)
 
   @doc false
   def audio_length(_ptr), do: raise Code.LoadError, file: @nif_path
@@ -137,7 +137,7 @@ defmodule Taglib do
   Returns the cover-art picture of the song.
   """
   @spec artwork(t) :: {mimetype, binary}
-  def artwork(taglib), do: artwork_picture(taglib.ptr)
+  def artwork(%__MODULE__{} = taglib), do: artwork_picture(taglib.ptr)
 
   @doc false
   def artwork_picture(_ptr), do: raise Code.LoadError, file: @nif_path
