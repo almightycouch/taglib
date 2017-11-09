@@ -319,16 +319,16 @@ static ERL_NIF_TERM artwork_picture(ErlNifEnv* env, int argc, const ERL_NIF_TERM
                 TagLib::MP4::CoverArt cover = covers.front();
                 TagLib::String mimetype;
                 switch(cover.format()) {
-                    case TagLib::MP4::CoverArt::Format::JPEG:
+                    case TagLib::MP4::CoverArt::JPEG:
                         mimetype = "image/jpeg";
                         break;
-                    case TagLib::MP4::CoverArt::Format::PNG:
+                    case TagLib::MP4::CoverArt::PNG:
                         mimetype = "image/png";
                         break;
-                    case TagLib::MP4::CoverArt::Format::BMP:
+                    case TagLib::MP4::CoverArt::BMP:
                         mimetype = "image/bmp";
                         break;
-                    case TagLib::MP4::CoverArt::Format::GIF:
+                    case TagLib::MP4::CoverArt::GIF:
                         mimetype = "image/gif";
                 }
                 return enif_make_tuple(env, 2, string_to_binary(env, mimetype), string_to_binary(env, cover.data()));
