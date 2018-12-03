@@ -1,4 +1,4 @@
-# Taglib
+# TagLib
 
 [![Travis](https://img.shields.io/travis/almightycouch/taglib.svg)](https://travis-ci.org/almightycouch/taglib)
 [![Hex.pm](https://img.shields.io/hexpm/v/taglib.svg)](https://hex.pm/packages/taglib)
