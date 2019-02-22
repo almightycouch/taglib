@@ -40,7 +40,7 @@ defmodule Taglib.Mixfile do
   end
 
   defp deps do
-    [{:elixir_make, "~> 0.4", runtime: false},
+    [{:elixir_make, "~> 0.5", runtime: false},
      {:ex_doc, ">= 0.0.0", only: :dev}]
   end
 end
