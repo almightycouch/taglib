@@ -256,6 +256,7 @@ static ERL_NIF_TERM tag_disc(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]
             const TagLib::Ogg::FieldListMap &list_map = comment->fieldListMap();
             return enif_make_uint(env, extractTag<unsigned int>(list_map, "DISCNUMBER"));
         }
+        return enif_make_atom(env, "nil");
     } else {
         return enif_make_badarg(env);
     }
@@ -295,6 +296,7 @@ static ERL_NIF_TERM tag_compilation(ErlNifEnv* env, int argc, const ERL_NIF_TERM
             const TagLib::Ogg::FieldListMap &list_map = comment->fieldListMap();
             return enif_make_bool(env, extractTag<bool>(list_map, "COMPILATION"));
         }
+        return enif_make_atom(env, "nil");
     } else {
         return enif_make_badarg(env);
     }
@@ -358,6 +360,9 @@ static ERL_NIF_TERM artwork_picture(ErlNifEnv* env, int argc, const ERL_NIF_TERM
                 return enif_make_tuple(env, 2, string_to_binary(env, mimetype), string_to_binary(env, picture.picture()));
             }
         }
+        return enif_make_atom(env, "nil");
+    } else {
+        return enif_make_badarg(env);
     }
 }
 
