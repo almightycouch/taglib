@@ -53,6 +53,15 @@ defmodule Taglib do
   end
 
   @doc """
+  Returns the tags of the song as map.
+  """
+  @spec props(t) :: map
+  def props(%__MODULE__{} = taglib), do: tag_props(taglib.ptr)
+
+  @doc false
+  def tag_props(_ptr), do: raise Code.LoadError, file: @nif_path
+
+  @doc """
   Returns the title of the song.
   """
   @spec title(t) :: String.t

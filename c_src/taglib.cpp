@@ -7,6 +7,7 @@
 
 #include <taglib/fileref.h>
 #include <taglib/audioproperties.h>
+#include <taglib/tpropertymap.h>
 #include <taglib/tag.h>
 #include <taglib/mp4file.h>
 #include <taglib/mp4item.h>
@@ -202,6 +203,31 @@ static TagLib::AudioProperties *taglib_nif_resource_audio_props(ErlNifEnv* env, 
         return nullptr;
     }
 }
+
+static TagLib::PropertyMap taglib_nif_resource_props(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    if(TagLib::File *file = taglib_nif_resource_file(env, argc, argv)) {
+        return file->properties();
+    } else {
+        return TagLib::PropertyMap();
+    }
+}
+
+static ERL_NIF_TERM tag_props(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    const TagLib::PropertyMap props = taglib_nif_resource_props(env, argc, argv);
+    if(!props.isEmpty()) {
+        ERL_NIF_TERM results = enif_make_new_map(env);
+        for(TagLib::PropertyMap::ConstIterator iter = props.begin(); iter != props.end(); iter++) {
+            enif_make_map_put(env, results, string_to_binary(env, iter->first), string_to_binary(env, iter->second.toString()), &results);
+        }
+        return results;
+    } else {
+        return enif_make_badarg(env);
+    }
+}
+
+
 static ERL_NIF_TERM tag_title(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     if(TagLib::Tag *tag = taglib_nif_resource_tag(env, argc, argv)) {
@@ -381,6 +407,7 @@ static int taglib_nif_init(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_i
 static ErlNifFunc taglib_nif_funcs[] =
 {
     {"init_taglib", 1, taglib_nif_resource_create},
+    {"tag_props", 1, tag_props},
     {"tag_title", 1, tag_title},
     {"tag_artist", 1, tag_artist},
     {"tag_album", 1, tag_album},
