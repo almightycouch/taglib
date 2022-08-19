@@ -1,4 +1,4 @@
-# TagLib
+# Taglib bindings for Elixir
 
 [![Travis](https://img.shields.io/travis/almightycouch/taglib.svg)](https://travis-ci.org/almightycouch/taglib)
 [![Hex.pm](https://img.shields.io/hexpm/v/taglib.svg)](https://hex.pm/packages/taglib)
@@ -6,7 +6,9 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/almightycouch/taglib/master/LICENSE)
 [![Github Issues](https://img.shields.io/github/issues/almightycouch/taglib.svg)](http://github.com/almightycouch/taglib/issues)
 
-Taglib bindings for Elixir.
+![Cover image](http://i.imgur.com/vFRNIdu.jpg)
+
+This package contains a set of Elixir bindings for the Taglib library for reading metadata for popular audio formats. The bindings are for the C library, which only supports the limited abstract API of Taglib.
 
 ## Documentation
 
